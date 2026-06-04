@@ -102,7 +102,7 @@ def get_dashboard(db: Session = Depends(get_db)):
     p_repo = ProductRepository(db)
     c_repo = CustomerRepository(db)
     o_repo = OrderRepository(db)
-    low_stock = p_repo.get_low_stock(threshold=10)
+    low_stock = p_repo.get_low_stock(threshold=10, limit=20)
     return ApiResponse(
         data={
             "total_products": p_repo.count(),

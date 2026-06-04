@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
+from app.models.order import OrderStatus
 
 
 class OrderItemCreate(BaseModel):
@@ -54,7 +55,7 @@ class OrderResponse(BaseModel):
     id: int
     customer_id: int
     total_amount: Decimal
-    status: str
+    status: OrderStatus
     created_at: datetime
     items: list[OrderItemResponse] = []
     customer_name: Optional[str] = None

@@ -16,6 +16,7 @@ from app.schemas.auth import (
     SignupRequest,
     TokenResponse,
 )
+from app.config import get_settings
 from app.schemas.response import ApiResponse
 from app.schemas.user import UserOut
 from app.services.auth import AuthService
@@ -63,8 +64,8 @@ def forgot_password(request: Request, body: ForgotPasswordRequest, svc: AuthServ
     # In production: email the token, return generic message
     # In dev: return the token directly
     response_data: dict = {"message": "If that email exists, a reset link has been sent"}
-    if reset_token:
-        response_data["reset_token"] = reset_token  # Remove this in production
+    if reset_token and get_settings().DEBUG:
+        response_data["reset_token"] = reset_token
     return ApiResponse(data=response_data)
 
 

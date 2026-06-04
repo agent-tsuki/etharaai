@@ -4,7 +4,8 @@ from alembic import context
 
 from app.config import get_settings
 from app.database import Base
-import app.models  # noqa: F401 — registers all models with Base metadata
+# registers all models with Base metadata
+import app.models  # noqa: F401
 
 config = context.config
 fileConfig(config.config_file_name)

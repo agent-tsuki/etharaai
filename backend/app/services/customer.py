@@ -14,13 +14,10 @@ class CustomerService:
         self.repo = repo
         self._email_cache = email_cache
 
-    # ── Cache management ──────────────────────────────────────────────────
-
     def _warm_cache(self) -> None:
         if self._email_cache.is_stale:
             self._email_cache.rebuild(self.repo.get_all_emails())
 
-    # ── Queries ────────────────────────────────────────────────────────────
 
     def get_all_customers(self, skip: int = 0, limit: int = 100) -> list[Customer]:
         return self.repo.get_all(skip=skip, limit=limit)
@@ -41,11 +38,8 @@ class CustomerService:
             return self.repo.count()
         return self.repo.count_filtered(filters)
 
-    # ── Mutations ──────────────────────────────────────────────────────────
-
     def create_customer(self, data: CustomerCreate) -> Customer:
         self._warm_cache()
-        # Skip DB lookup when bloom filter is certain this email is absent
         if self._email_cache.might_exist(data.email) and self.repo.get_by_email(data.email):
             raise ConflictError(f"Customer with email '{data.email}' already exists")
         customer = self.repo.create(data.model_dump())

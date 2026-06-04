@@ -3,6 +3,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel
+from app.models.order import OrderStatus
 
 
 class ComparisonOperator(str, Enum):
@@ -19,9 +20,6 @@ class ProductFilter(BaseModel):
     stock_operator: ComparisonOperator = ComparisonOperator.gte
 
     # Price filter
-    # Both provided  → range: min_price <= price <= max_price
-    # Only min_price  → single-bound controlled by price_operator
-    # Only max_price  → price <= max_price
     min_price: Optional[Decimal] = None
     max_price: Optional[Decimal] = None
     price_operator: ComparisonOperator = ComparisonOperator.gte
@@ -29,9 +27,9 @@ class ProductFilter(BaseModel):
 
 class OrderFilter(BaseModel):
     customer_id: Optional[int] = None
-    status: Optional[str] = None
+    status: Optional[OrderStatus] = None
 
-    # Amount filter (same single/range semantics as price above)
+    # Amount filter
     min_amount: Optional[Decimal] = None
     max_amount: Optional[Decimal] = None
     amount_operator: ComparisonOperator = ComparisonOperator.gte

@@ -7,7 +7,6 @@ class TokenRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    # --- Refresh tokens ---
 
     def create_refresh_token(self, user_id: int, token_hash: str, expires_at: datetime) -> RefreshToken:
         rt = RefreshToken(user_id=user_id, token_hash=token_hash, expires_at=expires_at)
@@ -34,7 +33,6 @@ class TokenRepository:
         ).update({"revoked": True})
         self.db.flush()
 
-    # --- Password reset tokens ---
 
     def create_reset_token(self, user_id: int, token_hash: str, expires_at: datetime) -> PasswordResetToken:
         # Invalidate any existing unused reset tokens for this user

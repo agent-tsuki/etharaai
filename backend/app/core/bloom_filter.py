@@ -94,16 +94,16 @@ class EntityBloomCache:
         with self._lock:
             self._filter.add(item)
 
+    def invalidate(self) -> None:
+        with self._lock:
+            self._initialized = False
+
     def might_exist(self, item: str) -> bool:
         """Returns False only when item is DEFINITELY not in the set."""
         if not self._initialized:
             return True
         return item in self._filter
 
-
-# ── Module-level singletons ────────────────────────────────────────────────
-# Shared across all requests in a single process.  The 5-minute TTL means
-# the filter is rebuilt from DB at most once per 5 minutes per worker.
 
 product_sku_cache: EntityBloomCache = EntityBloomCache(capacity=500_000, ttl_seconds=300)
 product_id_cache: EntityBloomCache = EntityBloomCache(capacity=500_000, ttl_seconds=300)

@@ -1,7 +1,7 @@
 import logging
 from decimal import Decimal
 from app.core.bloom_filter import EntityBloomCache
-from app.models.order import Order, OrderItem
+from app.models.order import Order, OrderItem, OrderStatus
 from app.repositories.order import OrderRepository
 from app.repositories.product import ProductRepository
 from app.repositories.customer import CustomerRepository
@@ -25,7 +25,6 @@ class OrderService:
         self.customer_repo = customer_repo
         self._product_id_cache = product_id_cache
 
-    # ── Queries ────────────────────────────────────────────────────────────
 
     def get_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
         return self.order_repo.get_all_with_items(skip=skip, limit=limit)
@@ -46,25 +45,33 @@ class OrderService:
             return self.order_repo.count()
         return self.order_repo.count_filtered(filters)
 
-    # ── Mutations ──────────────────────────────────────────────────────────
+
+    def _warm_product_cache(self) -> None:
+        if self._product_id_cache.is_stale:
+            rows = self.product_repo.get_all_ids_and_skus()
+            self._product_id_cache.rebuild(str(r[0]) for r in rows)
 
     def create_order(self, data: OrderCreate) -> Order:
         self._validate_customer(data.customer_id)
+        self._warm_product_cache()
+
+        qty_by_product: dict[int, int] = {}
+        for item in data.items:
+            qty_by_product[item.product_id] = qty_by_product.get(item.product_id, 0) + item.quantity
 
         products_with_qty: list[tuple] = []
-        for item in data.items:
-            # Bloom filter eliminates a DB round-trip for IDs that are definitely absent
-            if not self._product_id_cache.might_exist(str(item.product_id)):
-                raise NotFoundError("Product", item.product_id)
-            product = self.product_repo.get_by_id(item.product_id)
+        for product_id, qty in qty_by_product.items():
+            if not self._product_id_cache.might_exist(str(product_id)):
+                raise NotFoundError("Product", product_id)
+            product = self.product_repo.get_by_id_for_update(product_id)
             if product is None:
-                raise NotFoundError("Product", item.product_id)
-            self._validate_stock(product, item.quantity)
-            products_with_qty.append((product, item.quantity))
+                raise NotFoundError("Product", product_id)
+            self._validate_stock(product, qty)
+            products_with_qty.append((product, qty))
 
         total = self._calculate_total(products_with_qty)
 
-        order = Order(customer_id=data.customer_id, total_amount=total, status="pending")
+        order = Order(customer_id=data.customer_id, total_amount=total, status=OrderStatus.pending)
         self.order_repo.db.add(order)
         self.order_repo.db.flush()
 
@@ -80,7 +87,6 @@ class OrderService:
             product.quantity -= qty
 
         self.order_repo.db.commit()
-        self.order_repo.db.refresh(order)
         order = self.order_repo.get_with_items(order.id)
         logger.info(
             "Order created: id=%d customer_id=%d total=%.2f items=%d",
@@ -99,8 +105,6 @@ class OrderService:
         self.order_repo.db.delete(order)
         self.order_repo.db.commit()
         logger.info("Order deleted: id=%d stock_restored=%d items", order_id, len(order.items))
-
-    # ── Helpers ────────────────────────────────────────────────────────────
 
     def _validate_customer(self, customer_id: int) -> None:
         if self.customer_repo.get_by_id(customer_id) is None:

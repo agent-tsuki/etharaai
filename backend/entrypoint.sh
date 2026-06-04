@@ -22,6 +22,8 @@ except Exception:
 done
 
 echo "Running database migrations..."
+# Alembic uses a PostgreSQL advisory lock — safe to run from multiple replicas,
+# but for large-scale deployments prefer a dedicated init container or migration job.
 alembic upgrade head
 
 echo "Starting server..."

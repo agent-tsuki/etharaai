@@ -12,8 +12,21 @@ class ProductRepository(BaseRepository[Product]):
     def get_by_sku(self, sku: str) -> Optional[Product]:
         return self.db.query(Product).filter(Product.sku == sku).first()
 
-    def get_low_stock(self, threshold: int = 10) -> list[Product]:
-        return self.db.query(Product).filter(Product.quantity <= threshold).all()
+    def get_by_id_for_update(self, product_id: int) -> Optional[Product]:
+        return (
+            self.db.query(Product)
+            .filter(Product.id == product_id)
+            .with_for_update()
+            .first()
+        )
+
+    def get_low_stock(self, threshold: int = 10, limit: int = 50) -> list[Product]:
+        return (
+            self.db.query(Product)
+            .filter(Product.quantity <= threshold)
+            .limit(limit)
+            .all()
+        )
 
     def update_quantity(self, entity_id: int, quantity_delta: int) -> Optional[Product]:
         product = self.get_by_id(entity_id)

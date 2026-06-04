@@ -1,1 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environments
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+env/
+
+# Distribution / build
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Vercel
 .vercel

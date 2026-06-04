@@ -13,8 +13,6 @@ from app.services.product import ProductService
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-# ── Filter dependency ──────────────────────────────────────────────────────
-
 def _product_filter(
     name: Optional[str] = Query(None, description="Partial name match (case-insensitive)"),
     sku: Optional[str] = Query(None, description="Exact SKU match"),
@@ -52,8 +50,6 @@ def _product_filter(
         price_operator=price_operator,
     )
 
-
-# ── Public GET endpoints (no authentication required) ──────────────────────
 
 @router.get(
     "/",
@@ -96,8 +92,6 @@ def get_product(
     product = service.get_product_by_id(product_id)
     return ApiResponse(data=product)
 
-
-# ── Protected write endpoints (admin or manager) ────────────────────────────
 
 @router.post(
     "/",

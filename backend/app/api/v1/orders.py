@@ -14,8 +14,6 @@ from app.services.order import OrderService
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
-# ── Filter dependency ──────────────────────────────────────────────────────
-
 def _order_filter(
     customer_id: Optional[int] = Query(None, description="Filter by customer ID"),
     status_: Optional[str] = Query(
@@ -50,8 +48,6 @@ def _order_filter(
         date_to=date_to,
     )
 
-
-# ── Public GET endpoints (no authentication required) ──────────────────────
 
 @router.get(
     "/",
@@ -95,7 +91,6 @@ def get_order(
     return ApiResponse(data=OrderResponse.from_orm_full(order))
 
 
-# ── Protected write endpoints ──────────────────────────────────────────────
 
 @router.post(
     "/",

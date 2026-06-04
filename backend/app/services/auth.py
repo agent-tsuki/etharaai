@@ -17,6 +17,8 @@ from app.schemas.auth import TokenResponse
 
 settings = get_settings()
 
+_DUMMY_HASH: str = hash_password("__timing_dummy__")
+
 
 class AuthService:
     def __init__(self, db: Session):
@@ -35,9 +37,7 @@ class AuthService:
 
     def login(self, email: str, password: str) -> TokenResponse:
         user = self.user_repo.get_by_email(email)
-        # Always run verify_password even on no-user to prevent timing attacks
-        dummy_hash = "$2b$12$KIXEJp59rI1DXNUt7UuDSOaqMFBLBCvXU0nHC/QUf3xLv4nABLBBO"
-        ok = verify_password(password, user.hashed_password if user else dummy_hash)
+        ok = verify_password(password, user.hashed_password if user else _DUMMY_HASH)
         if not user or not ok or not user.is_active:
             raise AppException(status_code=401, detail="Invalid credentials", error_code="INVALID_CREDENTIALS")
         result = self._issue_tokens(user)
@@ -58,7 +58,7 @@ class AuthService:
         user = self.user_repo.get_by_id(rt.user_id)
         if not user or not user.is_active:
             raise AppException(status_code=401, detail="User not found or inactive", error_code="INVALID_CREDENTIALS")
-        # Token rotation: revoke old, issue new
+
         self.token_repo.revoke_refresh_token(token_hash)
         result = self._issue_tokens(user)
         self.db.commit()
@@ -73,7 +73,8 @@ class AuthService:
         """Returns reset token in dev mode. In production, email it and return None."""
         user = self.user_repo.get_by_email(email)
         if not user:
-            return None  # Always return None — caller responds 200 regardless
+            return None
+
         raw, token_hash = generate_opaque_token()
         expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.RESET_TOKEN_EXPIRE_MINUTES)
         self.token_repo.create_reset_token(user.id, token_hash, expires_at)

@@ -1,7 +1,16 @@
+import enum
 from datetime import datetime
-from sqlalchemy import Integer, String, Numeric, DateTime, ForeignKey, func
+from decimal import Decimal
+from sqlalchemy import Integer, String, Numeric, DateTime, ForeignKey, Enum, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
+
+
+class OrderStatus(str, enum.Enum):
+    pending = "pending"
+    processing = "processing"
+    completed = "completed"
+    cancelled = "cancelled"
 
 
 class Order(Base):
@@ -11,10 +20,14 @@ class Order(Base):
     customer_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("customers.id"), nullable=False
     )
-    total_amount: Mapped[float] = mapped_column(
+    total_amount: Mapped[Decimal] = mapped_column(
         Numeric(10, 2), nullable=False, default=0
     )
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending")
+    status: Mapped[OrderStatus] = mapped_column(
+        Enum(OrderStatus, native_enum=False, length=50),
+        nullable=False,
+        default=OrderStatus.pending,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     customer: Mapped["Customer"] = relationship("Customer", lazy="select")
@@ -34,7 +47,7 @@ class OrderItem(Base):
         Integer, ForeignKey("products.id"), nullable=False
     )
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
-    unit_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
 
     order: Mapped["Order"] = relationship("Order", back_populates="items")
     product: Mapped["Product"] = relationship("Product", lazy="select")

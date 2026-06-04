@@ -12,16 +12,12 @@ from app.services.customer import CustomerService
 router = APIRouter(prefix="/customers", tags=["customers"])
 
 
-# ── Filter dependency ──────────────────────────────────────────────────────
-
 def _customer_filter(
     name: Optional[str] = Query(None, description="Partial name match (case-insensitive)"),
     email: Optional[str] = Query(None, description="Partial email match (case-insensitive)"),
 ) -> CustomerFilter:
     return CustomerFilter(name=name, email=email)
 
-
-# ── Public GET endpoints (no authentication required) ──────────────────────
 
 @router.get(
     "/",
@@ -64,8 +60,6 @@ def get_customer(
     customer = service.get_customer_by_id(customer_id)
     return ApiResponse(data=customer)
 
-
-# ── Protected write endpoints (admin or manager) ────────────────────────────
 
 @router.post(
     "/",

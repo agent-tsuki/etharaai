@@ -45,8 +45,6 @@ def require_roles(*roles: UserRole):
     return _check
 
 
-# ── Repository factories ───────────────────────────────────────────────────
-
 def get_product_repo(db: Session = Depends(get_db)) -> ProductRepository:
     return ProductRepository(db)
 
@@ -57,9 +55,6 @@ def get_customer_repo(db: Session = Depends(get_db)) -> CustomerRepository:
 
 def get_order_repo(db: Session = Depends(get_db)) -> OrderRepository:
     return OrderRepository(db)
-
-
-# ── Service factories ──────────────────────────────────────────────────────
 
 def get_product_service(
     repo: ProductRepository = Depends(get_product_repo),

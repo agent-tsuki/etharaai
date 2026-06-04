@@ -20,7 +20,6 @@ class ProductService:
         self._sku_cache = sku_cache
         self._id_cache = id_cache
 
-    # ── Cache management ──────────────────────────────────────────────────
 
     def _warm_caches(self) -> None:
         """Rebuild stale bloom filters from DB in one lightweight query."""
@@ -34,7 +33,6 @@ class ProductService:
         if sku_stale:
             self._sku_cache.rebuild(r[1] for r in rows)
 
-    # ── Queries ────────────────────────────────────────────────────────────
 
     def get_all_products(self, skip: int = 0, limit: int = 100) -> list[Product]:
         return self.repo.get_all(skip=skip, limit=limit)
@@ -46,7 +44,6 @@ class ProductService:
 
     def get_product_by_id(self, product_id: int) -> Product:
         self._warm_caches()
-        # Bloom filter eliminates a DB round-trip for IDs that are definitely absent
         if not self._id_cache.might_exist(str(product_id)):
             raise NotFoundError("Product", product_id)
         product = self.repo.get_by_id(product_id)
@@ -62,13 +59,11 @@ class ProductService:
     def get_low_stock_products(self, threshold: int = 10) -> list[Product]:
         return self.repo.get_low_stock(threshold)
 
-    # ── Mutations ──────────────────────────────────────────────────────────
 
     def create_product(self, data: ProductCreate) -> Product:
         if data.quantity < 0:
             raise NegativeQuantityError()
         self._warm_caches()
-        # Skip the DB uniqueness check when bloom filter is certain SKU is absent
         if self._sku_cache.might_exist(data.sku) and self.repo.get_by_sku(data.sku):
             raise ConflictError(f"Product with SKU '{data.sku}' already exists")
         product = self.repo.create(data.model_dump())
@@ -96,6 +91,6 @@ class ProductService:
     def delete_product(self, product_id: int) -> None:
         self.get_product_by_id(product_id)
         self.repo.delete(product_id)
-        # Deletions make the filter stale; TTL will trigger a full rebuild on next use
-        self._id_cache._initialized = False
+        self._id_cache.invalidate()
+        self._sku_cache.invalidate()
         logger.info("Product deleted: id=%d", product_id)
