@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+*.egg-info
+.git
+.gitignore
+README.md
+tests/
+.pytest_cache
+.mypy_cache
+.venv
+venv/

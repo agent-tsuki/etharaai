@@ -1,0 +1,26 @@
+# Development override — mounts src/ as a volume so Vite hot-reloads on every save.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# The frontend service is replaced with a Vite dev server (port 3000).
+# Backend and DB are unchanged.
+
+services:
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install --silent && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: "http://localhost:8000"
+      BACKEND_TARGET: "http://backend:8000"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+volumes:
+  frontend_node_modules:

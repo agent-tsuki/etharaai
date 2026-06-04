@@ -1,0 +1,375 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-html: #070913;
+  --text-html: #f8fafc;
+  --bg-card: rgba(15, 23, 42, 0.35);
+  --border-card: rgba(255, 255, 255, 0.06);
+  --bg-input: rgba(2, 6, 23, 0.6);
+  --border-input: rgba(30, 41, 59, 0.8);
+  --text-input: #e2e8f0;
+  --bg-modal: #0d1324;
+  --bg-sidebar: #020617;
+  --border-sidebar: rgba(30, 41, 59, 0.8);
+  --bg-main: linear-gradient(to bottom, #090c15, #070913);
+  --text-title: #ffffff;
+  --text-subtitle: #94a3b8;
+  --bg-select-option: #020617;
+  --bg-secondary-btn: rgba(15, 23, 42, 0.8);
+  --border-secondary-btn: rgba(30, 41, 59, 0.85);
+  --text-secondary-btn: #e2e8f0;
+  --bg-mobile-topbar: rgba(2, 6, 23, 0.9);
+  --border-mobile-topbar: rgba(15, 23, 42, 1);
+  --bg-table-header: rgba(2, 6, 23, 0.4);
+  --border-table-row: rgba(15, 23, 42, 0.6);
+}
+
+.light {
+  --bg-html: #f1f5f9;
+  --text-html: #0f172a;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --border-card: rgba(203, 213, 225, 0.7);
+  --bg-input: rgba(255, 255, 255, 0.95);
+  --border-input: rgba(203, 213, 225, 0.9);
+  --text-input: #0f172a;
+  --bg-modal: #ffffff;
+  --bg-sidebar: #ffffff;
+  --border-sidebar: rgba(226, 232, 240, 1);
+  --bg-main: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+  --text-title: #0f172a;
+  --text-subtitle: #475569;
+  --bg-select-option: #ffffff;
+  --bg-secondary-btn: rgba(255, 255, 255, 0.9);
+  --border-secondary-btn: rgba(203, 213, 225, 0.9);
+  --text-secondary-btn: #334155;
+  --bg-mobile-topbar: rgba(255, 255, 255, 0.9);
+  --border-mobile-topbar: rgba(226, 232, 240, 1);
+  --bg-table-header: rgba(241, 245, 249, 0.6);
+  --border-table-row: rgba(226, 232, 240, 0.6);
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-html);
+    color: var(--text-html);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: var(--border-card);
+  }
+
+  /* Custom scrollbars that adapt to themes */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-input);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-subtitle);
+  }
+}
+
+@layer components {
+  /* ── Buttons ─────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50
+           disabled:opacity-40 disabled:cursor-not-allowed select-none;
+  }
+  
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white
+           shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 border border-white/10
+           hover:brightness-110 active:brightness-95;
+  }
+  
+  .btn-secondary {
+    @apply btn shadow-md border;
+    background-color: var(--bg-secondary-btn) !important;
+    border-color: var(--border-secondary-btn) !important;
+    color: var(--text-secondary-btn) !important;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--bg-html) !important;
+    color: var(--text-title) !important;
+    border-color: var(--border-card) !important;
+  }
+  
+  .btn-danger {
+    @apply btn bg-gradient-to-r from-rose-600 to-red-600 text-white
+           shadow-lg shadow-rose-500/20 border border-white/5 hover:brightness-110 active:brightness-95;
+  }
+  
+  .btn-ghost {
+    @apply btn text-slate-400 hover:text-slate-200 transition-colors;
+  }
+  
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400
+           border transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-slate-800;
+    background-color: var(--bg-secondary-btn);
+    border-color: var(--border-secondary-btn);
+  }
+  
+  .btn-icon:hover {
+    background-color: var(--bg-html);
+    color: var(--text-title);
+  }
+  
+  .btn-icon-danger {
+    @apply btn-icon hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/30;
+  }
+
+  /* ── Inputs & Form Controls ────────────────────────── */
+  .input {
+    @apply w-full px-4 py-3 text-xs border rounded-xl transition-all duration-200
+           placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80
+           disabled:opacity-40 disabled:cursor-not-allowed;
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-input) !important;
+    color: var(--text-input) !important;
+  }
+  
+  .input-error {
+    @apply border-rose-500/50 bg-rose-950/10 focus:ring-rose-500/30 focus:border-rose-500/80;
+  }
+  
+  .input-search {
+    @apply input pl-10;
+  }
+  
+  .label {
+    @apply block text-xs font-bold text-slate-400 tracking-wide uppercase mb-2;
+  }
+  
+  .field-error {
+    @apply text-[11px] text-rose-400 mt-1.5 flex items-center gap-1.5 font-medium;
+  }
+
+  /* Select specific styles to handle theme bg arrows and options */
+  select.input {
+    @apply appearance-none pr-8 bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+  }
+  
+  select.input option {
+    @apply py-2;
+    background-color: var(--bg-select-option) !important;
+    color: var(--text-input) !important;
+  }
+
+  /* ── Cards & Panels ────────────────────────────────── */
+  .card {
+    @apply rounded-2xl shadow-xl shadow-black/5 backdrop-blur-md border;
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-card) !important;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-2xl hover:shadow-indigo-500/5 hover:-translate-y-0.5 hover:border-slate-700/60 transition-all duration-300 cursor-pointer;
+  }
+
+  /* ── Page Layout & Typography ──────────────────────── */
+  .page-container {
+    @apply px-6 py-8 lg:px-10 max-w-7xl mx-auto;
+  }
+  
+  .page-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-8 pb-5 border-b;
+    border-color: var(--border-sidebar) !important;
+  }
+  
+  .page-title {
+    @apply text-2xl font-extrabold tracking-tight leading-none;
+    color: var(--text-title) !important;
+  }
+  
+  .page-subtitle {
+    @apply text-xs font-medium mt-2;
+    color: var(--text-subtitle) !important;
+  }
+
+  /* ── Badges ────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase select-none;
+  }
+  .badge-green  { @apply badge bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/25; }
+  .badge-blue   { @apply badge bg-indigo-500/10  text-indigo-400  ring-1 ring-indigo-500/25; }
+  .badge-yellow { @apply badge bg-amber-500/10   text-amber-400   ring-1 ring-amber-500/25; }
+  .badge-red    { @apply badge bg-rose-500/10    text-rose-400    ring-1 ring-rose-500/25; }
+  .badge-gray   { @apply badge bg-slate-800/60    text-slate-400   ring-1 ring-slate-800; }
+
+  /* ── Sidebar Nav Links ─────────────────────────────── */
+  .nav-link {
+    @apply flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-semibold
+           transition-all duration-200 select-none cursor-pointer;
+  }
+  
+  .nav-link-active {
+    @apply nav-link bg-gradient-to-r from-indigo-600/80 to-purple-600/80 text-white shadow-md shadow-indigo-600/10 border border-white/5;
+  }
+  
+  .nav-link-inactive {
+    @apply nav-link border border-transparent;
+    color: var(--text-subtitle);
+  }
+  .nav-link-inactive:hover {
+    color: var(--text-title);
+    background-color: var(--bg-secondary-btn);
+  }
+
+  /* ── Dividers ──────────────────────────────────────── */
+  .divider { @apply border-t; border-color: var(--border-sidebar); }
+
+  /* ── Modal ──────────────────────────────────────────── */
+  .modal-panel {
+    @apply rounded-3xl shadow-2xl flex flex-col border;
+    background-color: var(--bg-modal) !important;
+    border-color: var(--border-card) !important;
+  }
+
+  .modal-header {
+    @apply flex items-center justify-between px-6 py-5 border-b shrink-0;
+    background-color: var(--bg-table-header) !important;
+    border-color: var(--border-sidebar) !important;
+  }
+
+  .modal-title {
+    @apply text-xs font-bold uppercase tracking-widest;
+    color: var(--text-subtitle) !important;
+  }
+
+  .modal-close-btn {
+    @apply p-1.5 rounded-lg transition-all;
+    color: var(--text-subtitle);
+  }
+  .modal-close-btn:hover {
+    color: var(--text-title);
+    background-color: var(--bg-secondary-btn);
+  }
+
+  /* ── Toast Notification ─────────────────────────────── */
+  .toast-card {
+    @apply rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden flex items-start gap-4 border;
+    background-color: var(--bg-modal) !important;
+    border-color: var(--border-card) !important;
+  }
+
+  .toast-dismiss-btn {
+    color: var(--text-subtitle);
+    @apply p-1 rounded-lg transition-colors shrink-0;
+  }
+  .toast-dismiss-btn:hover {
+    color: var(--text-title);
+    background-color: var(--bg-secondary-btn);
+  }
+}
+
+/* ── Custom Utility Animations ────────────────────── */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-in-right {
+    animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-in-left {
+    animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Common Theme Overrides for Light Mode ────────── */
+.light .text-slate-100:not(.btn):not(.badge):not(.badge-gray),
+.light .text-slate-200:not(.btn):not(.badge):not(.badge-gray),
+.light .text-slate-300:not(.btn):not(.badge):not(.badge-gray),
+.light .text-white:not(.btn):not(.badge):not(.badge-gray):not(.btn-primary):not(.btn-danger) {
+  color: var(--text-html) !important;
+}
+
+.light .bg-slate-950,
+.light .bg-slate-950\/40,
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/80 {
+  background-color: var(--bg-table-header) !important;
+}
+
+.light .border-slate-900,
+.light .border-slate-800,
+.light .border-slate-700,
+.light .border-slate-600 {
+  border-color: var(--border-card) !important;
+}
+
+.light .divide-slate-900\/60 > * + * {
+  border-color: var(--border-table-row) !important;
+}
+
+.light table thead tr {
+  background-color: var(--bg-table-header) !important;
+  border-bottom-color: var(--border-sidebar) !important;
+}
+
+.light table tbody tr {
+  border-bottom-color: var(--border-table-row) !important;
+}
+
+.light table tbody tr:hover {
+  background-color: rgba(99, 102, 241, 0.04) !important;
+}
+
+.light table th {
+  color: var(--text-subtitle) !important;
+}
+
+.light table td {
+  color: var(--text-html) !important;
+}
+
+/* badge-gray must win over the broad td rule above */
+.light .badge-gray,
+.light table td .badge-gray {
+  background-color: rgba(226, 232, 240, 0.75) !important;
+  color: #475569 !important;
+  box-shadow: 0 0 0 1px rgba(203, 213, 225, 0.9) !important;
+}
+
+.light .hover\:border-slate-800:hover,
+.light .hover\:border-slate-700\/60:hover {
+  border-color: var(--border-card) !important;
+}
